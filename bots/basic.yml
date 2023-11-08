@@ -1,6 +1,8 @@
 ---
 name: Basic
 description: Basic movement avoids walls
+atrs:
+  clock_speed: 3
 code: |+
   main:
   mov 0 a

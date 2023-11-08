@@ -1,4 +1,7 @@
 ---
+arena:
+  height: 400
+  width: 600
 bot_attributes:
 - name: clock speed
   description: cpu instructions per tick

@@ -1,12 +1,14 @@
 # frozen_string_literal: true
 
+require 'bot/bot'
 require 'bot/cpu'
 
 module Bot
   RSpec.describe CPU do
     describe 'add' do
       it 'adds value of second arg to first' do
-        cpu = CPU.new
+        bot = instance_double(Bot, code: '')
+        cpu = CPU.new(bot)
         cpu[:a] = 1
         cpu.exec('add a 1')
         expect(cpu[:a]).to eq(2)
@@ -18,7 +20,8 @@ module Bot
 
     describe 'cmp' do
       it 'subtracts second arg from first, saves result in register c' do
-        cpu = CPU.new
+        bot = instance_double(Bot, code: '')
+        cpu = CPU.new(bot)
         cpu.exec('cmp 3 1')
         expect(cpu[:c]).to eq(2)
         cpu[:a] = 5
@@ -30,18 +33,22 @@ module Bot
 
     describe 'mov' do
       it 'moves value from one register to another' do
-        cpu = CPU.new
+        bot = instance_double(Bot, code: '')
+        cpu = CPU.new(bot)
         cpu[:b] = 3
         cpu.exec('mov b a')
         expect(cpu[:a]).to eq(3)
         expect(cpu[:b]).to eq(3)
         expect(cpu[:c]).to be_nil
+        cpu.exec('mov 7 a')
+        expect(cpu[:a]).to eq(7)
       end
     end
 
     describe 'sub' do
       it 'subtracts value of second arg from first' do
-        cpu = CPU.new
+        bot = instance_double(Bot, code: '')
+        cpu = CPU.new(bot)
         cpu[:a] = 5
         cpu.exec('sub a 3')
         expect(cpu[:a]).to eq(2)
