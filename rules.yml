@@ -26,6 +26,8 @@ cpu:
       description: first arg is a register, to which value of second arg is added
     cmp:
       description: compare values by subtraction, save result in register c
+    je:
+      description: jump to given label if the previous cmp was equal (ie. the value of register c is 0)
     mov:
       description: move value to register
     sub:

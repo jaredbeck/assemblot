@@ -7,7 +7,7 @@ module Bot
   RSpec.describe CPU do
     describe 'add' do
       it 'adds value of second arg to first' do
-        bot = instance_double(Bot, code: '')
+        bot = instance_double(Bot, code: '', vx: 0, vy: 0, x: 100, y: 100)
         cpu = CPU.new(bot)
         cpu[:a] = 1
         cpu.exec('add a 1')
@@ -20,7 +20,7 @@ module Bot
 
     describe 'cmp' do
       it 'subtracts second arg from first, saves result in register c' do
-        bot = instance_double(Bot, code: '')
+        bot = instance_double(Bot, code: '', vx: 0, vy: 0, x: 100, y: 100)
         cpu = CPU.new(bot)
         cpu.exec('cmp 3 1')
         expect(cpu[:c]).to eq(2)
@@ -31,9 +31,25 @@ module Bot
       end
     end
 
+    describe 'je' do
+      it 'jump if equal' do
+        code = <<~EOS
+          main:
+          cmp 0 0
+          je main
+        EOS
+        bot = instance_double(Bot, code: code, vx: 0, vy: 0, x: 100, y: 100)
+        cpu = CPU.new(bot)
+        cpu[:pc] = 2
+        cpu[:c] = 0
+        cpu.exec('je main')
+        expect(cpu[:pc]).to eq(0)
+      end
+    end
+
     describe 'mov' do
       it 'moves value from one register to another' do
-        bot = instance_double(Bot, code: '')
+        bot = instance_double(Bot, code: '', vx: 0, vy: 0, x: 100, y: 100)
         cpu = CPU.new(bot)
         cpu[:b] = 3
         cpu.exec('mov b a')
@@ -47,7 +63,7 @@ module Bot
 
     describe 'sub' do
       it 'subtracts value of second arg from first' do
-        bot = instance_double(Bot, code: '')
+        bot = instance_double(Bot, code: '', vx: 0, vy: 0, x: 100, y: 100)
         cpu = CPU.new(bot)
         cpu[:a] = 5
         cpu.exec('sub a 3')

@@ -7,16 +7,16 @@ class CPU
     @bot = bot
     parse(bot.code)
     @reg = {
-      vx: bot.vx,
+      pc: 0, # Program Counter (line index)
+      vx: bot.vx, # velocity
       vy: bot.vy,
-      x: bot.x,
+      x: bot.x, # position
       y: bot.y,
     }
     rules = load_rules
     @instructions = rules.fetch('instructions').keys.freeze
     @reg_ids = rules.fetch('registers').keys.freeze
     @halted = false
-    @pc = 0 # Program Counter (line index in @code)
   end
 
   def [](k)
@@ -28,11 +28,13 @@ class CPU
   end
 
   def exec(line)
-    return if @halted
     tok = line.split
     ins = tok.shift.downcase
     if @instructions.include?(ins)
       send ins, *tok
+      if ins[0] != 'j' # not a "jump"
+        @reg[:pc] += 1
+      end
     else
       warn format('Invalid instruction: %s', ins)
       @halted = true
@@ -41,11 +43,10 @@ class CPU
 
   def tick(t)
     clock_tick = 0
-    while clock_tick < @bot.clock_speed
-      line = @code[@pc]
+    while !@halted && clock_tick < @bot.clock_speed
+      line = @code[@reg[:pc]]
       puts format('%4d %4d %s', t, clock_tick, line)
       exec(line)
-      @pc += 1 # TODO: jumps
       clock_tick += 1
     end
   end
@@ -62,6 +63,16 @@ class CPU
 
   def cmp(i, j)
     self[:c] = val(i) - val(j)
+  end
+
+  def je(label)
+    jump(label) if @reg[:c] == 0
+  end
+
+  def jump(label)
+    @reg[:pc] = @labels.fetch(label)
+  rescue KeyError
+    warn format('Label not found: %s', label)
   end
 
   def load_rules
