@@ -1,0 +1,63 @@
+---
+bot_attributes:
+- name: clock speed
+  description: cpu instructions per tick
+  min: 1
+  max: 10
+  cost: 1
+- name: generator
+  description: power produced per tick
+  min: 0
+  max: 10
+  cost: 1
+- name: max. shield
+  description: shields fade
+  min: 0
+  max: 10
+  cost: 1
+cpu:
+  instructions:
+    acl:
+      description: accelerate, using XY vector from the registers
+    add:
+      description: first arg is a register, to which value of second arg is added
+    cmp:
+      description: compare values by subtraction, save result in register c
+    mov:
+      description: move value to register
+    sub:
+      description: first arg is a register, from which value of second arg is subtracted
+  registers:
+    a:
+      name: General register A
+    b:
+      name: General register B
+    c:
+      name: Control register
+      description: result of instructions like cmp
+    vx:
+      name: Velocity, X
+      description: current velocity, distance per tick, x-axis component
+      write: false
+    vy:
+      name: Velocity, Y
+      description: current velocity, distance per tick, y-axis component
+      write: false
+    wx:
+      name: Wall, X
+      description: the location, on the x-axis, of the right side of the arena
+      write: false
+    wy:
+      name: Wall, Y
+      description: the location, on the y-axis, of the top of the arena
+      write: false
+    x:
+      name: Position, X
+      description: current bot position, X
+      write: false
+    y:
+      name: Position, Y
+      description: current bot position, Y
+      write: false
+rules:
+  shield_fade: 1

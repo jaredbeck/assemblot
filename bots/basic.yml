@@ -1,0 +1,45 @@
+---
+name: Basic
+description: Basic movement avoids walls
+code: |+
+  main:
+  mov 0 a
+  add a vx
+  add a vy
+  cmp a 0
+  je rndacl
+  
+  scan:
+  cmp x 0
+  cmp 10 c
+  jle brakex
+  cmp x wx
+  cmp 10 c
+  jle brakex
+  cmp y 0
+  cmp 10 c
+  jle brakey
+  cmp y wy
+  cmp 10 c
+  jle brakey
+  jmp scan
+  
+  brakex:
+  mov x a
+  neg a
+  acl a 0
+  jmp scan
+  
+  brakey:
+  mov y a
+  neg a
+  acl 0 a
+  jmp scan
+  
+  rndacl:
+  mov 3 x
+  rnd x
+  mov 3 y
+  rnd y
+  acl
+  jmp main
