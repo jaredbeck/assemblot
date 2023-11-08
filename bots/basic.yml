@@ -4,16 +4,17 @@ description: Basic movement avoids walls
 atrs:
   clock_speed: 3
 code: |+
-  main:
+  main: # If stationary, accelerate
   mov 0 a
   add a vx
   add a vy
   cmp a 0
   je staticacltest
   
+  # Look for wall collision, brake
   scan:
-  cmp x 0
-  cmp c 10
+  cmp x 0 # distance to left wall
+  cmp c 10 # less than ten?
   jle brakex
   cmp wx x
   cmp c 10
@@ -38,6 +39,7 @@ code: |+
   acl 0 a
   jmp scan
   
+  # Accelerate randomly
   rndacl:
   mov 3 a
   rnd a
@@ -46,6 +48,7 @@ code: |+
   acl a b
   jmp scan
 
+  # Accelerate in a known direction, for testing
   staticacltest:
-  acl 0 1
+  acl 1 1
   jmp scan
