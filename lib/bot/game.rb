@@ -7,7 +7,7 @@ require 'bot/bot'
 
 module Bot
   class Game
-    MAX_TICKS = 10
+    MAX_TICKS = 100
 
     def initialize(rules_path, *bot_paths)
       @rules = YAML.safe_load(File.read(rules_path))

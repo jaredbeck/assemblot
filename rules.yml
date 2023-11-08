@@ -1,7 +1,7 @@
 ---
 arena:
-  height: 400
-  width: 600
+  height: 200
+  width: 200
 bot_attributes:
 - name: clock speed
   description: cpu instructions per tick
@@ -21,15 +21,29 @@ bot_attributes:
 cpu:
   instructions:
     acl:
-      description: accelerate, using XY vector from the registers
+      description: accelerate by specified x,y arguments
     add:
       description: first arg is a register, to which value of second arg is added
     cmp:
       description: compare values by subtraction, save result in register c
     je:
-      description: jump to given label if the previous cmp was equal (ie. the value of register c is 0)
+      description: >
+        Jump to given label if the previous cmp was equal (ie. the value of 
+        register c is 0)
+    jle:
+      description: >
+        Jump to given label if the previous cmp was less-than or equal (ie. the
+        value of register c is zero or negative)
+    jmp:
+      description: Jump to given label unconditionally
     mov:
       description: move value to register
+    neg:
+      description: negate value in register
+    rnd:
+      description: >
+        Replace the specified register's value with a random number between 0
+        and its current value.
     sub:
       description: first arg is a register, from which value of second arg is subtracted
   registers:

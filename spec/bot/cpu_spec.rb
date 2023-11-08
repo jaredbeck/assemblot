@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'bot/arena'
 require 'bot/bot'
 require 'bot/cpu'
 
@@ -47,6 +48,44 @@ module Bot
       end
     end
 
+    describe 'je' do
+      it 'jump if equal' do
+        code = <<~EOS
+          main:
+          cmp 0 1
+          jle main
+        EOS
+        bot = instance_double(Bot, code: code, vx: 0, vy: 0, x: 100, y: 100)
+        cpu = CPU.new(bot)
+        cpu[:pc] = 2
+        cpu[:c] = -1
+        cpu.exec('jle main')
+        expect(cpu[:pc]).to eq(0)
+        cpu[:pc] = 2
+        cpu[:c] = 0
+        cpu.exec('jle main')
+        expect(cpu[:pc]).to eq(0)
+        cpu[:pc] = 2
+        cpu[:c] = +1
+        cpu.exec('jle main')
+        expect(cpu[:pc]).to eq(3)
+      end
+    end
+
+    describe 'jmp' do
+      it 'jumps' do
+        code = <<~EOS
+          main:
+          jmp main
+        EOS
+        bot = instance_double(Bot, code: code, vx: 0, vy: 0, x: 100, y: 100)
+        cpu = CPU.new(bot)
+        cpu[:pc] = 1
+        cpu.exec('jmp main')
+        expect(cpu[:pc]).to eq(0)
+      end
+    end
+
     describe 'mov' do
       it 'moves value from one register to another' do
         bot = instance_double(Bot, code: '', vx: 0, vy: 0, x: 100, y: 100)
@@ -58,6 +97,37 @@ module Bot
         expect(cpu[:c]).to be_nil
         cpu.exec('mov 7 a')
         expect(cpu[:a]).to eq(7)
+      end
+    end
+
+    describe 'neg' do
+      it 'negates' do
+        arena = instance_double(Arena, height: 200, width: 200) # TODO: painful amount of test context just to instantiate CPU
+        bot = instance_double(Bot, arena: arena, code: '', vx: 0, vy: 0, x: 100, y: 100)
+        cpu = CPU.new(bot)
+        cpu[:b] = 3
+        cpu.exec('neg b')
+        expect(cpu[:b]).to eq(-3)
+        cpu.exec('neg b')
+        expect(cpu[:b]).to eq(+3)
+        cpu.exec('neg a')
+        expect(cpu[:a]).to eq(0)
+      end
+    end
+
+    describe 'rnd' do
+      it 'moves value from one register to another' do
+        bot = instance_double(Bot, code: '', vx: 0, vy: 0, x: 100, y: 100)
+        cpu = CPU.new(bot)
+        results = []
+        50.times do
+          cpu[:a] = 100
+          cpu.exec('rnd a')
+          results << cpu[:a]
+        end
+        results.each do |result|
+          expect((0..100)).to cover(result)
+        end
       end
     end
 

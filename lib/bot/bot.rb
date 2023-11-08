@@ -4,18 +4,18 @@ require 'bot/cpu'
 
 module Bot
   class Bot
-    attr_reader :code, :vx, :vy, :x, :y
+    attr_reader :arena, :code, :vx, :vy, :x, :y
 
     def initialize(name:, code:, atrs:, arena:)
       @name = name
       @code = code
-      @cpu = CPU.new(self)
       @atrs = atrs # e.g. clock speed
       @arena = arena
       @x = 100
       @y = 100
       @vx = 0
       @vy = 0
+      @cpu = CPU.new(self)
     end
 
     def acl(x, y)
@@ -32,7 +32,9 @@ module Bot
       @cpu.tick(t)
       @x = (@x + @vx).clamp(0, @arena.width)
       @y = (@y + @vy).clamp(0, @arena.height)
-      puts format('%d: %s (%d, %d)', t, @name, @x, @y)
+      puts format('%d: %s: Pos: %d, %d Vel: %d, %d', t, @name, @x, @y, @vx, @vy)
+      @cpu[:x] = @x
+      @cpu[:y] = @y
     end
   end
 end

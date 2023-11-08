@@ -9,39 +9,43 @@ code: |+
   add a vx
   add a vy
   cmp a 0
-  je rndacl
+  je staticacltest
   
   scan:
   cmp x 0
-  cmp 10 c
+  cmp c 10
   jle brakex
-  cmp x wx
-  cmp 10 c
+  cmp wx x
+  cmp c 10
   jle brakex
   cmp y 0
-  cmp 10 c
+  cmp c 10
   jle brakey
-  cmp y wy
-  cmp 10 c
+  cmp wy y
+  cmp c 10
   jle brakey
   jmp scan
   
   brakex:
-  mov x a
+  mov vx a
   neg a
   acl a 0
   jmp scan
   
   brakey:
-  mov y a
+  mov vy a
   neg a
   acl 0 a
   jmp scan
   
   rndacl:
-  mov 3 x
-  rnd x
-  mov 3 y
-  rnd y
-  acl
-  jmp main
+  mov 3 a
+  rnd a
+  mov 3 b
+  rnd b
+  acl a b
+  jmp scan
+
+  staticacltest:
+  acl 0 1
+  jmp scan

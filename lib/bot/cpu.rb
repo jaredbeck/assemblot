@@ -10,6 +10,8 @@ class CPU
       pc: 0, # Program Counter (line index)
       vx: bot.vx, # velocity
       vy: bot.vy,
+      wx: bot.arena.width,
+      wy: bot.arena.height,
       x: bot.x, # position
       y: bot.y,
     }
@@ -31,8 +33,10 @@ class CPU
     tok = line.split
     ins = tok.shift.downcase
     if @instructions.include?(ins)
-      send ins, *tok
-      if ins[0] != 'j' # not a "jump"
+      result = send ins, *tok
+      if ins[0] == 'j' && result == :jump
+        jump(tok.first)
+      else
         @reg[:pc] += 1
       end
     else
@@ -41,11 +45,20 @@ class CPU
     end
   end
 
+  def fetch(k)
+    if @reg_ids.include?(k.to_s)
+      self[k].to_i
+    else
+      warn format('Register not found: %s', k)
+      @halted = true
+    end
+  end
+
   def tick(t)
     clock_tick = 0
     while !@halted && clock_tick < @bot.clock_speed
       line = @code[@reg[:pc]]
-      puts format('%4d %4d %s', t, clock_tick, line)
+      puts format('%4d %4d %4d %20s %s', t, clock_tick, @reg[:pc], line, @reg)
       exec(line)
       clock_tick += 1
     end
@@ -54,7 +67,11 @@ class CPU
   private
 
   def acl(x, y)
-    @bot.acl(x, y)
+    dvx = val(x)
+    dvy = val(y)
+    self[:vx] += dvx
+    self[:vy] += dvy
+    @bot.acl(dvx, dvy) # hmmm. could get out of sync. maybe return stuff like vx from #tick instead
   end
 
   def add(i, j)
@@ -65,8 +82,16 @@ class CPU
     self[:c] = val(i) - val(j)
   end
 
-  def je(label)
-    jump(label) if @reg[:c] == 0
+  def je(_label)
+    @reg[:c] == 0 ? :jump : nil
+  end
+
+  def jle(_label)
+    @reg[:c] <= 0 ? :jump : nil
+  end
+
+  def jmp(_label)
+    :jump
   end
 
   def jump(label)
@@ -84,6 +109,10 @@ class CPU
     self[j] = val(i)
   end
 
+  def neg(k)
+    self[k] = - fetch(k).to_i
+  end
+
   def parse(code)
     @code = []
     @labels = {}
@@ -96,6 +125,10 @@ class CPU
         @labels[label_match.captures.first] = @code.length
       end
     end
+  end
+
+  def rnd(k)
+    self[k] = rand(self[k])
   end
 
   def sub(i, j)
