@@ -3,18 +3,11 @@
 require 'yaml'
 
 class CPU
-  def initialize(bot)
-    @bot = bot
-    parse(bot.code)
-    @reg = {
+  def initialize(code: '', reg: {})
+    parse(code)
+    @reg = reg.merge(
       pc: 0, # Program Counter (line index)
-      vx: bot.vx, # velocity
-      vy: bot.vy,
-      wx: bot.arena.width,
-      wy: bot.arena.height,
-      x: bot.x, # position
-      y: bot.y,
-    }
+    )
     rules = load_rules
     @instructions = rules.fetch('instructions').keys.freeze
     @reg_ids = rules.fetch('registers').keys.freeze
@@ -54,24 +47,22 @@ class CPU
     end
   end
 
-  def tick(t)
+  def tick(t, clock_speed)
     clock_tick = 0
-    while !@halted && clock_tick < @bot.clock_speed
+    while !@halted && clock_tick < clock_speed
       line = @code[@reg[:pc]]
       puts format('%4d %4d %4d %20s %s', t, clock_tick, @reg[:pc], line, @reg)
       exec(line)
       clock_tick += 1
     end
+    @reg.slice(:vx, :vy)
   end
 
   private
 
   def acl(x, y)
-    dvx = val(x)
-    dvy = val(y)
-    self[:vx] += dvx
-    self[:vy] += dvy
-    @bot.acl(dvx, dvy) # hmmm. could get out of sync. maybe return stuff like vx from #tick instead
+    self[:vx] += val(x)
+    self[:vy] += val(y)
   end
 
   def add(i, j)
