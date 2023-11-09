@@ -2,11 +2,11 @@
 
 require 'byebug'
 require 'yaml'
-require 'bot/arena'
-require 'bot/bot'
-require 'bot/rules'
+require 'assemblot/arena'
+require 'assemblot/bot'
+require 'assemblot/rules'
 
-module Bot
+module Assemblot
   class Game
     MAX_TICKS = 100
 
@@ -35,4 +35,4 @@ module Bot
   end
 end
 
-Bot::Game.new(*ARGV).run
+Assemblot::Game.new(*ARGV).run

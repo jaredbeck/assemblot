@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Bot
+module Assemblot
   class Rules
     def initialize(rules_path)
       @rules = YAML.safe_load(File.read(rules_path))

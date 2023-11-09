@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Bot
+module Assemblot
   class Arena
     attr_reader :height, :width
 

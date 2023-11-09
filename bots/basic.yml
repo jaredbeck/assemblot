@@ -73,5 +73,5 @@ code: |+
 
   # Accelerate in a known direction, for testing
   staticacltest:
-  acl 0 -2
+  acl 0 2
   jmp scan

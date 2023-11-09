@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require 'yaml'
-require 'bot/line'
+require 'assemblot/line'
 
-module Bot
+module Assemblot
   class CPU
     def initialize(code: '', reg: {})
       parse(code)

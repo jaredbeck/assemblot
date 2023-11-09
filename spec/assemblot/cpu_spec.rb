@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require 'bot/arena'
-require 'bot/bot'
-require 'bot/cpu'
-require 'bot/line'
+require 'assemblot/arena'
+require 'assemblot/bot'
+require 'assemblot/cpu'
+require 'assemblot/line'
 
-module Bot
+module Assemblot
   RSpec.describe CPU do
     describe 'add' do
       it 'adds value of second arg to first' do

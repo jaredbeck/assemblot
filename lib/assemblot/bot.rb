@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'bot/cpu'
+require 'assemblot/cpu'
 
-module Bot
+module Assemblot
   class Bot
     attr_reader :arena, :code, :vx, :vy, :x, :y
 

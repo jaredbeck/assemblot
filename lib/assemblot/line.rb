@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
-module Bot
+module Assemblot
+  # A parsed line of code.
   class Line
     LABEL_OPERATOR = ':'
 
-    attr_reader :command, :ix
+    attr_reader :command, :comment, :ix
 
     def initialize(raw, ix)
       @ix = ix
@@ -46,7 +47,7 @@ module Bot
     def parse(line)
       @empty = line.start_with?('#') || line.empty?
       return if @empty
-      comment_match = line.split('#')
+      comment_match = line.split('#').map(&:strip)
       if comment_match.length == 2
         @command, @comment = comment_match
       else
