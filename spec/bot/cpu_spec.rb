@@ -19,15 +19,55 @@ module Bot
       end
     end
 
+    describe 'and' do
+      it 'bitwise and, with constant' do
+        cpu = CPU.new
+        cpu[:a] = 5
+        cpu.exec(Line['and a 2'])
+        expect(cpu[:a]).to eq(0)
+      end
+
+      it 'bitwise and, with register' do
+        cpu = CPU.new
+        cpu[:a] = 5
+        cpu[:b] = 2
+        cpu.exec(Line['and a b'])
+        expect(cpu[:a]).to eq(0)
+        expect(cpu[:b]).to eq(2)
+      end
+    end
+
+    describe 'or' do
+      it 'bitwise logical or with constant' do
+        cpu = CPU.new
+        cpu[:a] = 5
+        cpu.exec(Line['or a 2'])
+        expect(cpu[:a]).to eq(7)
+      end
+
+      it 'bitwise logical or with register' do
+        cpu = CPU.new
+        cpu[:a] = 5
+        cpu[:b] = 2
+        cpu.exec(Line['or a b'])
+        expect(cpu[:a]).to eq(7)
+        expect(cpu[:b]).to eq(2)
+      end
+    end
+
     describe 'cmp' do
-      it 'subtracts second arg from first, saves result in register c' do
+      it 'subtracts second arg from first' do
         cpu = CPU.new
         cpu.exec(Line['cmp 3 1'])
-        expect(cpu[:c]).to eq(2)
+        expect(cpu[:pf]).to eq(0)
+        expect(cpu[:sf]).to eq(0)
+        expect(cpu[:zf]).to eq(0)
         cpu[:a] = 5
         cpu[:b] = 2
         cpu.exec(Line['cmp a b'])
-        expect(cpu[:c]).to eq(3)
+        expect(cpu[:pf]).to eq(1)
+        expect(cpu[:sf]).to eq(0)
+        expect(cpu[:zf]).to eq(0)
       end
     end
 
@@ -40,14 +80,14 @@ module Bot
         EOS
         cpu = CPU.new(code: code)
         cpu[:pc] = 2
-        cpu[:c] = 0
+        cpu[:zf] = 0
         cpu.exec(Line['je main'])
         expect(cpu[:pc]).to eq(0)
       end
     end
 
-    describe 'je' do
-      it 'jump if equal' do
+    describe 'jle' do
+      it 'jump if LTE' do
         code = <<~EOS
           main:
           cmp 0 1
@@ -55,15 +95,18 @@ module Bot
         EOS
         cpu = CPU.new(code: code)
         cpu[:pc] = 2
-        cpu[:c] = -1
+        cpu[:sf] = 1
+        cpu[:zf] = 0
         cpu.exec(Line['jle main'])
         expect(cpu[:pc]).to eq(0)
         cpu[:pc] = 2
-        cpu[:c] = 0
+        cpu[:sf] = 0
+        cpu[:zf] = 1
         cpu.exec(Line['jle main'])
         expect(cpu[:pc]).to eq(0)
         cpu[:pc] = 2
-        cpu[:c] = +1
+        cpu[:sf] = 0
+        cpu[:zf] = 0
         cpu.exec(Line['jle main'])
         expect(cpu[:pc]).to eq(3)
       end
@@ -89,7 +132,6 @@ module Bot
         cpu.exec(Line['mov b a'])
         expect(cpu[:a]).to eq(3)
         expect(cpu[:b]).to eq(3)
-        expect(cpu[:c]).to be_nil
         cpu.exec(Line['mov 7 a'])
         expect(cpu[:a]).to eq(7)
       end

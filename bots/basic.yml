@@ -2,7 +2,7 @@
 name: Basic
 description: Basic movement avoids walls
 atrs:
-  clock_speed: 3
+  clock_speed: 10
 code: |+
   main: # If stationary, accelerate
   mov 0 a
@@ -13,18 +13,41 @@ code: |+
   
   # Look for wall collision, brake
   scan:
-  cmp x 0 # distance to left wall
-  cmp c 10 # less than ten?
-  jle brakex
-  cmp wx x
-  cmp c 10
-  jle brakex
-  cmp y 0
-  cmp c 10
-  jle brakey
-  cmp wy y
-  cmp c 10
-  jle brakey
+  
+  mov x a
+  sub a 10 # if within 10 of left wall, then SF will be 1
+  mov sf a
+  cmp vx 0 # if velocity x is zero, then ZF will be 1
+  setnz b
+  and a b # if near (1), and has velocity (1), then ZF will be 0
+  jnz brakex
+  
+  mov wx a
+  sub a x # distance to right wall
+  sub a 10
+  mov sf a
+  cmp vx 0
+  setnz b
+  and a b
+  jnz brakex
+  
+  mov y a
+  sub a 10
+  mov sf a
+  cmp vy 0
+  setnz b
+  and a b
+  jnz brakey
+  
+  mov wy a
+  sub a y
+  sub a 10
+  mov sf a
+  cmp vy 0
+  setnz b
+  and a b
+  jnz brakey
+  
   jmp scan
   
   brakex:
@@ -50,5 +73,5 @@ code: |+
 
   # Accelerate in a known direction, for testing
   staticacltest:
-  acl 1 1
+  acl 0 -2
   jmp scan

@@ -26,7 +26,7 @@ module Bot
       )
       bots = [bot]
       tick = 0
-      while tick <= MAX_TICKS
+      while tick < MAX_TICKS
         bots.each { |b| b.tick(tick) }
         tick += 1
       end

@@ -24,6 +24,8 @@ cpu:
       description: accelerate by specified x,y arguments
     add:
       description: first arg is a register, to which value of second arg is added
+    and:
+      description: bitwise logical and into register specified by first arg
     cmp:
       description: compare values by subtraction, save result in register c
     je:
@@ -36,24 +38,40 @@ cpu:
         value of register c is zero or negative)
     jmp:
       description: Jump to given label unconditionally
+    jnz:
+      description: Jump if ZF == 0
     mov:
       description: move value to register
     neg:
       description: negate value in register
+    or:
+      description: bitwise logical or into register specified by first arg
     rnd:
       description: >
         Replace the specified register's value with a random number between 0
         and its current value.
+    setnz:
+      description: Set the specified register to 1 if ZF == 0
     sub:
       description: first arg is a register, from which value of second arg is subtracted
+    test:
+      description: https://en.wikipedia.org/wiki/TEST_(x86_instruction)
   registers:
     a:
       name: General register A
     b:
       name: General register B
-    c:
-      name: Control register
-      description: result of instructions like cmp
+    pf:
+      name: Parity flag
+      description: >
+        In x86 processors, the parity flag .. is set if the number of set bits of
+        ones is even (put another way, the parity bit is set if the sum of the
+        bits is even).
+      write: false
+    sf:
+      name: Sign flag
+      description: set to 1 if last op result was negative, else 0
+      write: false
     vx:
       name: Velocity, X
       description: current velocity, distance per tick, x-axis component
@@ -77,6 +95,11 @@ cpu:
     y:
       name: Position, Y
       description: current bot position, Y
+      write: false
+    zf:
+      name: Zero flag
+      description: >
+        Set to 1 if last op result was 0. Used by many instructions like jz, jnz
       write: false
 rules:
   shield_fade: 1

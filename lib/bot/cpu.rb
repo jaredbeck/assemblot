@@ -83,22 +83,46 @@ module Bot
 
     def add(i, j)
       self[i] = self[i].to_i + val(j)
+      set_flags(self[i])
     end
 
+    def and(i, j)
+      if @reg_ids.include?(i)
+        self[i] &= val(j)
+        set_flags(self[i])
+      else
+        halt(format('Register not found: %s', i))
+      end
+    end
+
+    def btoi(i)
+      i ? 1 : 0
+    end
+
+    # @doc https://en.wikipedia.org/wiki/FLAGS_register
     def cmp(i, j)
-      self[:c] = val(i) - val(j)
+      set_flags(val(i) - val(j))
+    end
+
+    def halt(msg)
+      warn msg
+      @halted = true
     end
 
     def je(_label)
-      @reg[:c] == 0 ? :jump : nil
+      self[:zf] ? :jump : nil
     end
 
     def jle(_label)
-      @reg[:c] <= 0 ? :jump : nil
+      (self[:sf] | self[:zf] == 1) ? :jump : nil
     end
 
     def jmp(_label)
       :jump
+    end
+
+    def jnz(_label)
+      self[:zf] == 1 ? nil : :jump
     end
 
     def jump(label)
@@ -118,6 +142,25 @@ module Bot
 
     def neg(k)
       self[k] = - fetch(k).to_i
+      set_flags(self[k])
+    end
+
+    def or(i, j)
+      if @reg_ids.include?(i)
+        self[i] |= val(j)
+        set_flags(self[i])
+      else
+        halt(format('Register not found: %s', i))
+      end
+    end
+
+    # > In x86 processors, the parity flag reflects the parity only of the least
+    # > significant byte of the result, and is set if the number of set bits of
+    # > ones is even (put another way, the parity bit is set if the sum of the
+    # > bits is even)
+    # > https://en.wikipedia.org/wiki/Parity_flag
+    def parity(i)
+      btoi(i.to_s(2).count('1').even?)
     end
 
     def parse(code)
@@ -131,14 +174,37 @@ module Bot
 
     def rnd(k)
       self[k] = rand(self[k])
+      set_flags(self[k])
+    end
+
+    def set_flags(x)
+      self[:sf] = btoi(x < 0)
+      self[:zf] = btoi(x == 0)
+      self[:pf] = parity(x)
+    end
+
+    def setnz(i)
+      self[i] = btoi(self[:zf] == 0)
     end
 
     def sub(i, j)
       self[i] = self[i].to_i - val(j)
+      set_flags(self[i])
+    end
+
+    # @doc https://en.wikipedia.org/wiki/TEST_(x86_instruction)
+    def test(i, j)
+      set_flags(i & j)
     end
 
     def val(k)
-      @reg_ids.include?(k) ? self[k].to_i : k.to_i
+      if @reg_ids.include?(k)
+        self[k].to_i
+      elsif k.match?(/\A-?\d+\z/)
+        k.to_i
+      else
+        halt(format('Invalid argument: expected register or integer, got: %s', k))
+      end
     end
   end
 end
