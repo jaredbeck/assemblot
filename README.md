@@ -13,7 +13,9 @@ walls-are-lava.
 ## Usage
 
 ```bash
-ruby -I lib lib/bot/game.rb rules.yml bots/basic.yml bots/my_bot.yml
+# Basic bot vs. itself
+ruby -I lib lib/assemblot/server.rb rules.yml bots/basic.yml bots/basic.yml &
+open frontend/app/index.html
 ```
 
 ## Getting started
@@ -34,9 +36,12 @@ x86 emulator.
 - Walls
 - A dozen CPU instructions
 - Bot attribute: CPU clock speed
+- Basic GUI (Eventmachine / WebSocket / HTML Canvas)
 
 ## TODO
 
+- GUI inputs: start, pause, stop, add/remove bots
+- [fix canvas flicker](https://gamedev.stackexchange.com/questions/182955/my-html-canvas-keep-flickering)
 - new file format so that line numbers match up
 - randomize initial bot placement
 - rotate gun turret and fire
@@ -44,7 +49,6 @@ x86 emulator.
 - walls are lava
 - bot attribute points (buying power-ups)
 - purchase more CPU registers (expensive!)
-- visualization
 - frame rate limit
 
 ## References

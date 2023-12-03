@@ -4,7 +4,7 @@ require 'assemblot/cpu'
 
 module Assemblot
   class Bot
-    attr_reader :arena, :code, :vx, :vy, :x, :y
+    attr_reader :arena, :code, :name, :vx, :vy, :x, :y
 
     def initialize(name:, code:, atrs:, arena:)
       @name = name

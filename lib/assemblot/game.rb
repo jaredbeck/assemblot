@@ -15,24 +15,67 @@ module Assemblot
       @bot_paths = bot_paths
     end
 
-    def run
-      arena = Arena.new(**@rules.arena_atrs)
-      basic = YAML.safe_load(File.read(@bot_paths.first))
-      bot = Bot.new(
-        arena: arena,
-        atrs: basic.fetch('atrs'),
-        code: basic.fetch('code'),
-        name: basic.fetch('name'),
-      )
-      bots = [bot]
-      tick = 0
-      while tick < MAX_TICKS
-        bots.each { |b| b.tick(tick) }
-        tick += 1
+    # @param channel [Channel]
+    def start_game(channel)
+      puts 'start_game'
+      raise 'invalid state transition' unless @state == 'pending'
+      @state = 'started'
+      @channel = channel
+    end
+
+    def start_thread
+      @state = 'pending'
+      @thread = Thread.new do
+        while @state == 'pending'
+          sleep 1
+        end
+        if @state != 'started'
+          puts 'doh never got to start the game'
+          break
+        end
+        puts 'woo really starting game'
+        arena = Arena.new(**@rules.arena_atrs)
+        @channel.push(
+          'arena_new',
+          height: arena.height,
+          width: arena.width
+        )
+        bots = @bot_paths.map { |path|
+          bot = YAML.safe_load(File.read(path))
+          Bot.new(
+            arena: arena,
+            atrs: bot.fetch('atrs'),
+            code: bot.fetch('code'),
+            name: bot.fetch('name'),
+          )
+        }
+        tick = 0
+        while tick < MAX_TICKS && @state == 'started'
+          sleep 0.1 # TODO: frame rate limit, sleep til next frame
+          @channel.push('tick', tick: tick)
+          bots.each { |b|
+            b.tick(tick)
+            @channel.push(
+              'bot_position',
+              botName: b.name,
+              x: b.x,
+              y: b.y
+            )
+          }
+          tick += 1
+        end
+        puts 'Game over'
+        @channel.push('game_over')
+      rescue Exception => e
+        warn e.full_message
+        raise e
       end
-      puts 'Game over'
+    end
+
+    def stop
+      puts 'stopping game'
+      @state = 'done'
+      @thread.join
     end
   end
 end
-
-Assemblot::Game.new(*ARGV).run

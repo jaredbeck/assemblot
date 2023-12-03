@@ -9,7 +9,7 @@ code: |+
   add a vx
   add a vy
   cmp a 0
-  je staticacltest
+  je rndacl
   
   # Look for wall collision, brake
   scan:
@@ -66,8 +66,10 @@ code: |+
   rndacl:
   mov 3 a
   rnd a
+  add a 1
   mov 3 b
   rnd b
+  add b 1
   acl a b
   jmp scan
 

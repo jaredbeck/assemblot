@@ -1,0 +1,16 @@
+body {
+  display: flex;
+  justify-content: flex-end;
+}
+#arena {
+  border: 1px solid red;
+  visibility: hidden;
+}
+#game {
+  border: 1px solid black;
+  width: 50%;
+}
+#log {
+  min-height: 200px;
+  width: 50%;
+}
